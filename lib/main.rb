@@ -36,7 +36,13 @@ class AyaDN
 		@hash = @api.getUniqueMessage(channel_id, message_id)
 		debugStream
 	end
-
+	def getSTDIN
+		if STDIN.tty?
+			STDIN.gets.chomp
+		else
+			STDIN.read
+		end	
+	end
 	def ayadnAuthorize(action)
 		$tools.fileOps("makedir", $ayadn_authorization_path)
 		if action == "reset"
@@ -54,7 +60,7 @@ class AyaDN
 				puts $status.launchAuthorization("osx")
 				$tools.startBrowser(url)
 			end
-			auth_token = STDIN.gets.chomp()
+			auth_token = getSTDIN()
 			$tools.fileOps("auth", "write", auth_token)
 			puts $status.authorized
 			sleep 3
@@ -183,7 +189,7 @@ class AyaDN
 		puts $status.writeMessage
 		max_char = 2048
 		begin
-			input_text = STDIN.gets.chomp
+			input_text = getSTDIN()
 		rescue Exception => e
 			abort($status.errorMessageNotSent)
 		end
@@ -197,6 +203,7 @@ class AyaDN
 			abort($status.errorMessageTooLong(real_length, to_remove))
 		end
 	end
+
 	def ayadnSendMessage(target, text)
 		abort($status.emptyPost) if (text.empty? || text == nil)
 		puts $status.sendMessage
@@ -216,7 +223,7 @@ class AyaDN
 		puts $status.writeMessage
 		max_char = 2048
 		begin
-			input_text = STDIN.gets.chomp
+			input_text = getSTDIN()	
 		rescue Exception => e
 			abort($status.errorMessageNotSent)
 		end
@@ -335,7 +342,7 @@ class AyaDN
 		end
 		print "\n#{text}"
 		begin
-			input_text = STDIN.gets.chomp
+			input_text = getSTDIN()
 		rescue Exception => e
 			abort($status.errorPostNotSent)
 		end
@@ -891,7 +898,7 @@ class AyaDN
  				puts "\nConfiguration does not include your Pinbard credentials.\n".red
  				begin
  					puts "Please enter your Pinboard username (CTRL+C to cancel): ".green
- 					pin_username = STDIN.gets.chomp()
+ 					pin_username = getSTDIN()
  					puts "\nPlease enter your Pinboard password (invisible, CTRL+C to cancel): ".green
  					pin_password = STDIN.noecho(&:gets).chomp()
  				rescue Exception => e
@@ -919,7 +926,7 @@ class AyaDN
         Process.detach(pid)
 
  		puts "Enter stream id: "
- 		stream_id = STDIN.gets.chomp
+ 		stream_id = getSTDIN()
  		last_page_id = nil
  		start = Time.now
  		case item
